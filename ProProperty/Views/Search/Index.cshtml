@@ -1,0 +1,167 @@
+﻿@model IEnumerable<ProProperty.Models.PropertyWithPremises>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+.legendtable th,td {
+    overflow: hidden;
+    width: 200px;
+}
+</style>
+<div class="row">
+    <img src="~/Image/header.png" />
+</div>
+
+<!--include to create javascript -->
+<script src="~/Scripts/googleApi.js">
+</script>  
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('div.col-md-1.dropdown button').on('click', function (event) {
+            $(this).parent().toggleClass('open');
+        });
+
+        $('body').on('click', function (e) {
+            if (!$('div.col-md-1.dropdown').is(e.target)
+                && $('div.col-md-1.dropdown').has(e.target).length === 0
+                && $('.open').has(e.target).length === 0
+            ) {
+                $('div.col-md-1.dropdown').removeClass('open');
+            }
+        });//End of body.onClick function body
+    });//End of document.ready function body
+</script>
+<div class="row">
+
+    @using (Html.BeginForm("SearchProperty", "Search", FormMethod.Post))
+    {
+
+        <div class="row">
+            <div class="col-md-2 @{if (ViewBag.ErrorPriceRange != null) {@Html.Raw("has-error")}}">@Html.DropDownList("priceRange_DDL", null, new { @class = "form-control" })</div>
+            <div class="col-md-2 @{if (ViewBag.ErrorPropertyType != null) {@Html.Raw("has-error")} } ">@Html.DropDownList("propertyType_DDL", null, new { @class = "form-control" })</div>
+            <div class="col-md-2 @{if (ViewBag.ErrorRoomType != null) {@Html.Raw("has-error")}}">@Html.DropDownList("roomType_DDL", null, new { @class = "form-control" })</div>
+            <div class="col-md-2 @{if (ViewBag.ErrorDistrict != null) {@Html.Raw("has-error")}}">@Html.DropDownList("district_DDL", null, new { @class = "form-control" })</div>
+            <div class="col-md-1 dropdown">
+                <button class="btn btn-default dropdown-toggle" type="button">
+                    Premises<span class="caret" />
+                </button>
+                <ul class="dropdown-menu">
+                    @{
+                        foreach (ProProperty.Models.PremiseType item in ViewBag.PremiseType)
+                        {
+                            <li>
+                                <a href="#" data-value="@item.premises_type_name">
+                                    @Html.CheckBox(item.premises_type_name, item.isChecked)
+                                    @item.premises_type_name
+                                </a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="col-md-2"><button type="submit" class="btn btn-success btn-md">Go</button></div>
+
+        </div><br />
+      
+    }
+</div>
+
+<div class="row">
+    @if (Model != null)
+    {
+        <h2>Result</h2>
+        <div class='col-md-4'>
+            <table class="table table-striped" data-link="row">
+                 <thead>
+                     <tr>
+                         <th width="5%">Hide/ Show</th>
+                         <th>Address</th>
+                         <th width="10%">Type</th>
+                         <th></th>
+                     </tr>
+                 </thead>
+                 <tbody>
+                    @foreach (var item in Model)
+                    {
+                    var location = Html.Raw(Json.Encode(item.property));
+                    <tr>
+                        <td rowspan="2"><input type="checkbox" onclick="showHideMarker(@item.property.propertyID.ToString())" checked="checked" /></td>
+                        <td rowspan="2">
+                            Blk @Html.DisplayFor(modelItem => item.property.block) 
+                            #@Html.DisplayFor(modelItem => item.property.unitFloor)-@Html.DisplayFor(modelItem => item.property.unitNo)
+                            @Html.DisplayFor(modelItem => item.property.address)</td>
+                        <td rowspan="2">@Html.DisplayFor(modelItem => item.property.propertyType)</td>
+                        <td><a href="@Url.Action("PropertyDetails", "Property", new { id = item.property.propertyID })">View Premises</a></td>
+                    </tr>
+                    <tr><td><a href="@Url.Action("PropertyInformation", "Property", new { id = item.property.propertyID })">View Information</a></td></tr>
+                     }
+                </tbody>
+            </table>
+        </div>
+    }
+    <script src="http://maps.googleapis.com/maps/api/js">
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){googleMap.init(); 
+            @if (Model != null)
+            {
+                foreach (var item in Model)
+                {
+                    var location = Html.Raw(Json.Encode(item.property));
+                    System.Diagnostics.Debug.WriteLine(location);
+                    <text>Marker.Create(@Html.DisplayFor(modelItem => item.property.propertyID), "@Html.DisplayFor(modelItem => item.property.address)", @Html.DisplayFor(modelItem => item.property.Latitude), @Html.DisplayFor(modelItem => item.property.Longitude),"@Html.DisplayFor(modelItem => item.property.propertyType)", "@Url.Action("PropertyDetails", "Property", new { id = item.property.propertyID } )", "@Url.Action("PropertyInformation", "Property", new { id = item.property.propertyID } )");</text>
+                 }
+             }
+        });
+    </script>
+    @if (Model != null)
+    {
+        <div id="map_canvas" class="col-md-8" style="height:600px;"></div>
+    }
+    else
+    {
+        <div id="map_canvas" class="col-md-12" style="height:600px;width:100%;"></div>
+    }
+</div>
+<div class="row">
+    <h3>Legend</h3>
+    <table class="legendtable">
+        <thead>
+            <tr>
+                <th>Property</th>
+                <th>Premises</th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><img src="~/Image/icon/private.png" /> Private</td>
+                <td><img src="~/Image/icon/clinic.png" /> Clinic</td>
+                <td><img src="~/Image/icon/dining.png" /> Dining</td>
+                <td><img src="~/Image/icon/school.png" /> School</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="~/Image/icon/hdb.png"> HDB</td>
+                <td><img src="~/Image/icon/gym.png" /> Gym</td>
+                <td><img src="~/Image/icon/highway.png" /> Highway</td>
+                <td><img src="~/Image/icon/supermarket.jpg" /> Supermarket</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><img src="~/Image/icon/landed.png"> Landed</td>
+                <td><img src="~/Image/icon/park.png" /> Park</td>
+                <td><img src="~/Image/icon/parking.png" /> Parking</td>
+                <td><img src="~/Image/icon/train.png" /> Train</td>
+                <td><img src="~/Image/icon/bus.png" /> Bus</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+

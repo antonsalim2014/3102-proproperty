@@ -1,0 +1,61 @@
+﻿@model IEnumerable<ProProperty.Models.HdbPriceRange>
+<style>
+    .centerForm{
+       margin-left:auto;
+       margin-right:auto;
+    }
+    .row {
+        display: table;
+    }
+</style>
+@{
+    ViewBag.Title = "Index";
+}
+<!---include for javascript-->
+<script src="http://maps.googleapis.com/maps/api/js"></script>
+<script type="text/javascript" src="~/Scripts/googleApi.js"></script>
+
+  <!-- Page Content -->
+<div class="container">
+
+    <!-- Portfolio Item Heading -->
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Average Property Pricing</h1>
+        </div>
+    </div>
+    <!-- Portfolio Item Row -->
+    <div class="row">
+
+        <div class="col-md-3">
+            <div class="centerForm">
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                @using (Html.BeginForm("Index", "AveragePropertySellingPrice", FormMethod.Post, new { @class = "centerForm" }))
+                {
+                    <div class="row">
+                        <span class="col-md-6">Room Type</span>
+                        <span class="col-md-6">@Html.DropDownList("roomType_DDL")</span>
+
+                    </div>
+                    <div class="row">
+                        <span class="col-md-6">District</span>
+                        <span class="col-md-6">@Html.DropDownList("district_DDL")</span>
+
+                    </div>
+                    <button type="submit" class="btn btn-success btn-md">Go</button>
+                }
+            </div>
+        </div>
+
+        <div class="col-md-9">
+
+            <img src="@Url.Action("EfficiencyChart", "AveragePropertySellingPrice",new { district = @ViewBag.viewTown, room = @ViewBag.viewRoom })" />
+        </div>
+    </div>
+</div>

@@ -1,0 +1,82 @@
+﻿@model ProProperty.Models.PropertyWithPremises
+
+@{
+    ViewBag.Title = "PropertyInformation";
+}
+<style>
+    .propertyResult th, td {
+        overflow: hidden;
+        height: 15px;
+    }
+
+    .grey {
+        color: grey;
+        font-weight: 200;
+    }
+
+    .bold {
+        font-weight: bold;
+        font-size: large;
+    }
+</style>
+<h2>Property Informations</h2>
+
+<div>
+    <hr />
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <table class="propertyResult table-condensed">
+                    <tbody>
+                        <tr>
+                            <td><div class="bold">Block</div></td>
+                            <td>@Html.DisplayFor(model => model.property.block)</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bold">Unit</div></td>
+                            <td>#@Html.DisplayFor(model => model.property.unitFloor) - @Html.DisplayFor(model => model.property.unitNo)</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bold">Postal Code</div></td>
+                            <td>@Html.DisplayFor(model => model.property.postalCode)</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bold">Asking price</div></td>
+                            <td>$@Html.DisplayFor(model => model.property.asking)</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bold">Date posted</div></td>
+                            <td>@Html.DisplayFor(model => model.property.datePosted)</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bold">Built Size</div></td>
+                            <td>@Html.DisplayFor(model => model.property.built_size_in_sqft)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Agent Information</h3>
+                <table class="propertyResult table table-condensed" style="table-layout: fixed;">
+                    <tbody>
+                        <tr>
+                            <td rowspan="3"><img width="100" height="125" style="border:5px solid #000000; border-radius:25px" src="@Html.DisplayFor(model => model.agent.agent_image)" /></td>
+                            <td><div class="bold">Name</div></td>
+                            <td style="word-wrap:break-word;">@Html.DisplayFor(model => model.agent.agent_name)</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bold">Contact Number</div></td>
+                            <td style="word-wrap:break-word;">@Html.DisplayFor(model => model.agent.agent_contact_number)</td>
+                        </tr>
+                        <tr>
+                            <td><div class="bold">Email</div></td>
+                            <td style="word-wrap:break-word;">@Html.DisplayFor(model => model.agent.agent_email)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="col-md-8">
+                <img src="@Url.Action("compareChart", "AveragePropertySellingPrice",new { district = @ViewBag.Town_Name, room = @ViewBag.Property_Room_Type,currentPrice=@ViewBag.CurrentPrice })" />
+            </div>
+        </div>
+    </div>
+</div>

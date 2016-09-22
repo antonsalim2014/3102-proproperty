@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Pro property</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span  class="glyphicon glyphicon-home" aria-hidden="true" style="color:white"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <button class="btn navbar-btn navbar-inverse" style="border:0">
+                    <span class="glyphicon glyphicon-home" aria-hidden="true" style="color:white"></span>
+                    @Html.ActionLink("ProProperty", "Index", "Search", null, new { @style = "color:white;" })
+                    </button>
+</div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><button class="btn navbar-btn navbar-inverse" style="border:0">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true" style="color:white"></span>
+                        @Html.ActionLink("Search", "Index", "Search", null,new { @style = "color:white;" })
+                        </button>
+                    </li>
+                    <li><button class="btn navbar-btn navbar-inverse" style="border:0">
+                        <span class="glyphicon glyphicon-usd" aria-hidden="true" style="color:white"></span>
+                        @Html.ActionLink("Average pricing in district", "Index", "AveragePropertySellingPrice",null, new { @style = "color:white;" })
+                    </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Pro property</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
