@@ -30,11 +30,7 @@ var Marker =
 
 //var map;
 function createMarker(id, address, lat, lng, type, LinkPropertyDetails, LinkPropertyInformation) {
-    console.log(id + lat);
-    console.log(lng);
-    console.log(type);
     var image = returnIcon(type);
-    console.log(image);
     var marker = new google.maps.Marker
         (
             {

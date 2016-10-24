@@ -2,6 +2,7 @@
 using ProProperty.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -21,6 +22,7 @@ namespace ProProperty.Controllers
         private static List<SelectListItem> propertyTypeList = null;
         private static List<SelectListItem> roomTypeList = null;
         private static List<SelectListItem> districtAreaList = null;
+        private static List<Premise> premisesList = null;
         private static int selectedPriceRange;
         private static int selectedPropertyType;
         private static int selectedRoomType;
@@ -40,13 +42,20 @@ namespace ProProperty.Controllers
                 Config(selectedPriceRange, selectedPropertyType, selectedRoomType, selectedDistrict);
             }
             propertyController.clearListProperty();
+            
+            if(premisesList == null)
+                premisesList = premisesGateway.GetAllPremises().ToList();
+
             return View();
         }
 
         
         public ActionResult SearchProperty()
         {
-            try {
+            Stopwatch sw = Stopwatch.StartNew();
+
+            try
+            {
                 selectedPriceRange = Int32.Parse(Request.Form["priceRange_DDL"].ToString());
                 selectedPropertyType = Int32.Parse(Request.Form["propertyType_DDL"].ToString());
                 selectedRoomType = Int32.Parse(Request.Form["roomType_DDL"].ToString());
@@ -74,6 +83,7 @@ namespace ProProperty.Controllers
             string roomTypeStr = roomTypeList.Where(type => type.Value == selectedRoomType.ToString()).First().Text;
             string districtStr = districtAreaList.Where(district => district.Value == selectedDistrict.ToString()).First().Text;
 
+
             Town town = townGateway.SelectByTownName(districtStr);
             if(town == null)
             {
@@ -90,10 +100,57 @@ namespace ProProperty.Controllers
             List<Property> allProperties = propertyGateway.GetProperties
                 (town.town_id, minMaxPrice[0], minMaxPrice[1], minBuiltSize, maxBuiltSize, propertyTypeStr);
 
+
+            List<int> type_id = new List<int>();
+            for (int i = 0; i < premisesTypeList.Count; i++)
+            {
+                anyPremisesChecked |= premisesTypeList[i].isChecked;
+                allPremisesChecked &= premisesTypeList[i].isChecked;
+                if (premisesTypeList[i].isChecked)
+                    type_id.Add(premisesTypeList[i].premises_type_id);
+            }
+
+            List<Premise> allPremises = new List<Premise>();
+            try
+            {
+                if (!anyPremisesChecked || allPremisesChecked)
+                {
+                    foreach (Premise p in premisesList)
+                    {
+                        if (p.town_id == town.town_id)
+                            allPremises.Add(p);
+                    }
+                    //allPremises = premisesGateway.SelectAll(town.town_id).ToList();
+                }
+                else
+                {
+                    foreach (Premise p in premisesList)
+                    {
+                        if (p.town_id == town.town_id)
+                        {
+                            foreach (int typeid in type_id)
+                            {
+                                if (typeid == p.premises_type_id)
+                                {
+                                    allPremises.Add(p);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    //allPremises = premisesGateway.GetPremises(town.town_id, type_id.ToArray()).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                string mes = ex.Message;
+            }
+            
             foreach (Property p in allProperties)
             {
                 Agent agt = agentGateway.SelectById(p.agent_id);
-                PropertyWithPremises pwp = new PropertyWithPremises() { property = p, agent= agt, listOfPremise = findPremises(p) };
+                PropertyWithPremises pwp = new PropertyWithPremises() { property = p, agent = agt, listOfPremise = findPremises(p, allPremises) }; //new List<Premise>() };
+
                 if (pwp.listOfPremise.Count > 0)
                 {
                     propertyController.addProperty(pwp);
@@ -101,6 +158,9 @@ namespace ProProperty.Controllers
             }
 
             Config(selectedPriceRange, selectedPropertyType, selectedRoomType, selectedDistrict);
+
+            sw.Stop();
+            Debug.WriteLine(allProperties.Count + ": " + sw.ElapsedMilliseconds + " ms");
             return View("Index", propertyController.getAllProperties());
         }
 
@@ -166,7 +226,7 @@ namespace ProProperty.Controllers
         }
 
         /*distance algo for doing ranging*/
-        private double distanceAlgo(Property property, Premise premise)
+        public double distanceAlgo(Property property, Premise premise)
         {
             double calculation = 0;
             int R = 6371;
@@ -185,30 +245,8 @@ namespace ProProperty.Controllers
             return degrees * (Math.PI / 180);
         }
 
-        private List<Premise> findPremises(Property property)
+        public List<Premise> findPremises(Property property, List<Premise> allPremises)
         {
-            List<int> type_id = new List<int>();
-            for (int i = 0; i < premisesTypeList.Count; i++)
-            {
-                anyPremisesChecked |= premisesTypeList[i].isChecked;
-                allPremisesChecked &= premisesTypeList[i].isChecked;
-                if (premisesTypeList[i].isChecked)
-                    type_id.Add(premisesTypeList[i].premises_type_id);
-            }
-
-            List<Premise> allPremises = new List<Premise>();
-            try
-            {
-                if (!anyPremisesChecked || allPremisesChecked)
-                    allPremises = premisesGateway.SelectAll().ToList();
-                else
-                    allPremises = premisesGateway.GetPremises(type_id.ToArray()).ToList();
-            }
-            catch (Exception ex)
-            {
-                string mes = ex.InnerException.ToString();
-            }
-
             List<Premise> filteredPremises = new List<Premise>();
             foreach (var premise in allPremises)
             {

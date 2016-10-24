@@ -25,11 +25,11 @@ var Property =
     }
 }
 function createPropertyMarker(id, address, lat, lng, type) {
-    console.log(id + lat);
-    console.log(lng);
-    console.log(type);
+    //console.log(id + lat);
+    //console.log(lng);
+    //console.log(type);
     var image = returnIcon(type);
-    console.log(image);
+    //console.log(image);
     var marker = new google.maps.Marker
     (
         {
@@ -70,11 +70,11 @@ var Premise =
     }
 }
 function createPremisesMarker(id, address, lat, lng, type) {
-    console.log(id + lat);
-    console.log(lng);
-    console.log(type);
+    //console.log(id + lat);
+    //console.log(lng);
+    //console.log(type);
     var image = returnPremises(type);
-    console.log(image);
+    //console.log(image);
     var marker = new google.maps.Marker
         (
             {

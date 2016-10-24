@@ -9,7 +9,7 @@ namespace ProProperty.Services
 {
     public class HdbPriceRangeService : IHdbPriceRangeService
     {
-        private const string URL = "https://data.gov.sg/api/action/datastore_search?resource_id=d23b9636-5812-4b33-951e-b209de710dd5";
+        private const string URL = "https://data.gov.sg/api/action/datastore_search?resource_id=d23b9636-5812-4b33-951e-b209de710dd5&limit=200";
 
         public List<HdbPriceRange> GetHdbPriceRange()
         {
@@ -37,6 +37,7 @@ namespace ProProperty.Services
             JsonResult jsonResult = new System.Web.Script.Serialization.JavaScriptSerializer().Deserialize<JsonResult>(jsonResponse);
             foreach (Record i in jsonResult.result.records)
             {
+                if (i.min_selling_price == "na") continue;
                 HdbPriceRange hdbRange = new HdbPriceRange();
                 hdbRange.hdb_id = i._id;
                 hdbRange.town = i.town;

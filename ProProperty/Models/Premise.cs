@@ -18,5 +18,6 @@ namespace ProProperty.Models
         public decimal premises_long { get; set; }
         public int premises_type_id { get; set; }
         public String premises_image { get; set; }
+        public int town_id { get; set; }
     }
 }

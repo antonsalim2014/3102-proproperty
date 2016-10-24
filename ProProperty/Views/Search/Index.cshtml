@@ -71,36 +71,127 @@
 <div class="row">
     @if (Model != null)
     {
-        <h2>Result</h2>
+        <script>
+            @{ List<ProProperty.Models.Property> propertyList = new List<ProProperty.Models.Property>(); };
+            @foreach (ProProperty.Models.PropertyWithPremises item in Model.ToList<ProProperty.Models.PropertyWithPremises>())
+            {
+                propertyList.Add(item.property);
+            }
+            var unsortedPropertyList = @Html.Raw(Json.Encode(propertyList));
+            
+        </script>
+        <h2>Result</h2> 
         <div class='col-md-4'>
-            <table class="table table-striped" data-link="row">
+            <a href="#" onclick="sort();">Sort by price</a>
+            <table class="table table-striped" data-link="row" id="propertyTable">
                  <thead>
                      <tr>
-                         <th width="5%">Hide/ Show</th>
+                         @*<th width="5%">Hide/ Show</th>*@
                          <th>Address</th>
                          <th width="10%">Type</th>
-                         <th></th>
+                         <th>Price S$</th>
                      </tr>
                  </thead>
                  <tbody>
-                    @foreach (var item in Model)
-                    {
-                    var location = Html.Raw(Json.Encode(item.property));
-                    <tr>
-                        <td rowspan="2"><input type="checkbox" onclick="showHideMarker(@item.property.propertyID.ToString())" checked="checked" /></td>
-                        <td rowspan="2">
-                            Blk @Html.DisplayFor(modelItem => item.property.block) 
-                            #@Html.DisplayFor(modelItem => item.property.unitFloor)-@Html.DisplayFor(modelItem => item.property.unitNo)
-                            @Html.DisplayFor(modelItem => item.property.address)</td>
-                        <td rowspan="2">@Html.DisplayFor(modelItem => item.property.propertyType)</td>
-                        <td><a href="@Url.Action("PropertyDetails", "Property", new { id = item.property.propertyID })">View Premises</a></td>
-                    </tr>
-                    <tr><td><a href="@Url.Action("PropertyInformation", "Property", new { id = item.property.propertyID })">View Information</a></td></tr>
-                     }
                 </tbody>
             </table>
         </div>
     }
+
+    <script>
+
+        for(i = 0; i < unsortedPropertyList.length; i++){            
+            var tableRef = document.getElementById('propertyTable').getElementsByTagName('tbody')[0];
+            // Insert a row in the table at row index 0
+            var newRow   = tableRef.insertRow(tableRef.rows.length);
+
+            // Insert a cell in the row at index 0
+            var addressCell  = newRow.insertCell(0);
+
+            // Append a text node to the cell
+            var address = "Blk " + unsortedPropertyList[i].block + " #" + unsortedPropertyList[i].unitFloor + "-" + unsortedPropertyList[i].unitNo + " " + unsortedPropertyList[i].address;
+            var newTextAddress  = document.createTextNode(address);
+            addressCell.appendChild(newTextAddress);
+
+            // Insert a cell in the row at index 0
+            var typeCell  = newRow.insertCell(1);
+
+            // Append a text node to the cell
+            var type = "" + unsortedPropertyList[i].propertyType;
+            var newTextType  = document.createTextNode(type);
+            typeCell.appendChild(newTextType);
+
+            // Insert a cell in the row at index 0
+            var priceCell  = newRow.insertCell(2);
+
+            // Append a text node to the cell
+            var price = "" + unsortedPropertyList[i].valuation;
+            var newTextprice  = document.createTextNode(price);
+            priceCell.appendChild(newTextprice);
+        }
+    </script>
+
+    <script>
+        function sort(){
+            console.profile("sort");
+            sortPropertyByPrice();
+            console.profileEnd("sort");
+        }
+
+        function sortPropertyByPrice(){
+            //console.time("sortPropertyByPrice");
+
+            var sortedPropertyList = unsortedPropertyList;
+
+            for(outer = 0; outer < sortedPropertyList.length; outer++){
+                for(inner = outer + 1; inner < sortedPropertyList.length; inner++){
+                    if(sortedPropertyList[outer].valuation < sortedPropertyList[inner].valuation){
+                        var temp = sortedPropertyList[outer];
+                        sortedPropertyList[outer] = sortedPropertyList[inner];
+                        sortedPropertyList[inner] = temp;
+                    }
+                }
+            }
+            
+            var tableTbody = document.getElementById('propertyTable').getElementsByTagName('tbody')[0];
+            while(tableTbody.hasChildNodes())
+            {
+                tableTbody.removeChild(tableTbody.firstChild);
+            }
+
+            for(i = 0; i < sortedPropertyList.length; i++){            
+                var tableRef = document.getElementById('propertyTable').getElementsByTagName('tbody')[0];
+                // Insert a row in the table at row index 0
+                var newRow   = tableRef.insertRow(tableRef.rows.length);
+
+                // Insert a cell in the row at index 0
+                var addressCell  = newRow.insertCell(0);
+
+                // Append a text node to the cell
+                var address = "Blk " + sortedPropertyList[i].block + " #" + sortedPropertyList[i].unitFloor + "-" + sortedPropertyList[i].unitNo + " " + sortedPropertyList[i].address;
+                var newTextAddress  = document.createTextNode(address);
+                addressCell.appendChild(newTextAddress);
+
+                // Insert a cell in the row at index 0
+                var typeCell  = newRow.insertCell(1);
+
+                // Append a text node to the cell
+                var type = "" + sortedPropertyList[i].propertyType;
+                var newTextType  = document.createTextNode(type);
+                typeCell.appendChild(newTextType);
+
+                // Insert a cell in the row at index 0
+                var priceCell  = newRow.insertCell(2);
+
+                // Append a text node to the cell
+                var price = "" + sortedPropertyList[i].valuation;
+                var newTextprice  = document.createTextNode(price);
+                priceCell.appendChild(newTextprice);
+            }
+
+        }
+    </script>
+
     <script src="http://maps.googleapis.com/maps/api/js">
     </script>
 
@@ -111,7 +202,7 @@
                 foreach (var item in Model)
                 {
                     var location = Html.Raw(Json.Encode(item.property));
-                    System.Diagnostics.Debug.WriteLine(location);
+                    //System.Diagnostics.Debug.WriteLine(location);
                     <text>Marker.Create(@Html.DisplayFor(modelItem => item.property.propertyID), "@Html.DisplayFor(modelItem => item.property.address)", @Html.DisplayFor(modelItem => item.property.Latitude), @Html.DisplayFor(modelItem => item.property.Longitude),"@Html.DisplayFor(modelItem => item.property.propertyType)", "@Url.Action("PropertyDetails", "Property", new { id = item.property.propertyID } )", "@Url.Action("PropertyInformation", "Property", new { id = item.property.propertyID } )");</text>
                  }
              }

@@ -10,7 +10,7 @@ namespace ProProperty.Controllers
         private IPropertyGateway propertyDataGateway = new PropertyGateway();
         private ITownGateway townDataGateway = new TownGateway();
         private IAgentGateway agentGateway = new AgentGateway();
-        private static List<PropertyWithPremises> propertyList = new List<PropertyWithPremises>();
+        private List<PropertyWithPremises> propertyList = new List<PropertyWithPremises>();
 
         // GET: Property/Details/5
         public ActionResult PropertyDetails(int? id)

@@ -13,7 +13,7 @@ namespace ProProperty.DAL
         {
 
         }
-
+        
         //holds the tours
         //when we run app and create a new tour, it will be added to the Tours DbSet
         //and create a new database which contains a Tours table(based on Tours class)

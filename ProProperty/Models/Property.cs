@@ -23,12 +23,13 @@ namespace ProProperty.Models
         public String agreedPrice { get; set; }
         public int valuation { get; set; }
         public decimal built_size_in_sqft { get; set; }
-        public decimal land_size_in_sqft { get; set; }
+        //public decimal land_size_in_sqft { get; set; }
         public String propertyType { get; set; }
-        public DateTime datePosted { get; set; }
-        public DateTime exclusiveDate { get; set; }
-        public DateTime expiryDate { get; set; }
+        //public DateTime datePosted { get; set; }
+        //public DateTime exclusiveDate { get; set; }
+        //public DateTime expiryDate { get; set; }
         public int agent_id { get; set; }
+        public Boolean available { get; set; }
 
         [NotMapped]
         private static double squareFoot = 10.7639;
